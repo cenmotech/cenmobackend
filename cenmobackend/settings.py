@@ -73,13 +73,27 @@ WSGI_APPLICATION = 'cenmobackend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
+# Database hosted at neondb
+DATABASES = {
+  'default': {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': 'testing',
+    'USER': 'fikriazain',
+    'PASSWORD': 'FkcWa6Oy0Ebr',
+    'HOST': 'ep-dry-breeze-131341.ap-southeast-1.aws.neon.tech',
+    'PORT': '5432',
+    'OPTIONS': {
+            'sslmode': 'require',
+        },
+  }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
