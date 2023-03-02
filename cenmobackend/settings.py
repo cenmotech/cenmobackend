@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,12 +38,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'authuser',
+    'rest_framework',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -80,20 +85,42 @@ WSGI_APPLICATION = 'cenmobackend.wsgi.application'
 #     }
 # }
 
+#   'default': {
+#     'ENGINE': 'django.db.backends.postgresql',
+#     'NAME': 'testing',
+#     'USER': 'fikriazain',
+#     'PASSWORD': 'FkcWa6Oy0Ebr',
+#     'HOST': 'ep-dry-breeze-131341.ap-southeast-1.aws.neon.tech',
+#     'PORT': '5432',
+#     'OPTIONS': {
+#             'options': '-c search_path=cenmo',
+#         },
+#   }
+
+TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
 # Database hosted at neondb
 DATABASES = {
-  'default': {
-    'ENGINE': 'django.db.backends.postgresql',
-    'NAME': 'testing',
-    'USER': 'fikriazain',
-    'PASSWORD': 'FkcWa6Oy0Ebr',
-    'HOST': 'ep-dry-breeze-131341.ap-southeast-1.aws.neon.tech',
-    'PORT': '5432',
-    'OPTIONS': {
-            'sslmode': 'require',
+
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'Fikriazain23!',
+        'HOST': 'localhost',
+        'PORT': '5432',
+        'OPTIONS': {
+            'options': '-c search_path=cenmo',
         },
-  }
+    }
 }
+
+if TESTING:  # Pycharm: https://stackoverflow.com/a/20836704/7069108
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -135,3 +162,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'authuser.User'
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
