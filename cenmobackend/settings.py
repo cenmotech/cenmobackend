@@ -85,33 +85,22 @@ WSGI_APPLICATION = 'cenmobackend.wsgi.application'
 #     }
 # }
 
-#   'default': {
-#     'ENGINE': 'django.db.backends.postgresql',
-#     'NAME': 'testing',
-#     'USER': 'fikriazain',
-#     'PASSWORD': 'FkcWa6Oy0Ebr',
-#     'HOST': 'ep-dry-breeze-131341.ap-southeast-1.aws.neon.tech',
-#     'PORT': '5432',
-#     'OPTIONS': {
-#             'options': '-c search_path=cenmo',
-#         },
-#   }
 
 TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
 # Database hosted at neondb
 DATABASES = {
 
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'Fikriazain23!',
-        'HOST': 'localhost',
-        'PORT': '5432',
-        'OPTIONS': {
+  'default': {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': 'testing',
+    'USER': 'fikriazain',
+    'PASSWORD': 'FkcWa6Oy0Ebr',
+    'HOST': 'ep-dry-breeze-131341.ap-southeast-1.aws.neon.tech',
+    'PORT': '5432',
+    'OPTIONS': {
             'options': '-c search_path=cenmo',
         },
-    }
+  }
 }
 
 if TESTING:  # Pycharm: https://stackoverflow.com/a/20836704/7069108
