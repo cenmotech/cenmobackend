@@ -8,6 +8,11 @@ class TestsUrls(TestCase):
     def test_url_is_resolved_login(self):
         url = reverse('login')
         self.assertEquals(resolve(url).func, login)
+        
+    def test_url_is_resolved_register(self):
+        url = reverse('register')
+        self.assertEquals(resolve(url).func, register)
+
 
 
 
