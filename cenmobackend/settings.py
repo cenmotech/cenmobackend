@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-&!a%bi@e=4yms@h4wefydx(y-)z$4#@1wtrf$40-+c9y%vm-81
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*', 'herokuapp.com', 'localhost', '.vercel.app']
+ALLOWED_HOSTS = ['*', 'herokuapp.com', 'localhost', '.vercel.app', 'cenmo.tech']
 
 
 # Application definition
@@ -47,9 +47,10 @@ INSTALLED_APPS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
+    'https://cenmo.tech',
     'http://localhost:3000',
     'https://cenmo-frontend-dickynasje.vercel.app',
-    'https://cenmo-frontend.vercel.app'
+    'https://cenmo-frontend.vercel.app',
     # add other domains as needed
 ]
 
@@ -103,7 +104,7 @@ DATABASES = {
     'NAME': 'postgres',
     'USER': 'postgres',
     'PASSWORD': 'FkcWa6Oy0Ebr',
-    'HOST': 'db.byoiqfduiqfvrgmwjnmk.supabase.co',
+    'HOST': 'db.krparxvtaxxgroffdseu.supabase.co',
     'PORT': '5432',
     'OPTIONS': {
             'options': '-c search_path=public'
