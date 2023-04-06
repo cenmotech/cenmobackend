@@ -117,16 +117,4 @@ def get_user_profile(request):
             address_list.append({'address_name': i.address_name, 'street': i.street, 'city': i.city, 'province': i.province, 'zip_code': i.zip_code, "id": i.id})
         return JsonResponse({'name': user.name, 'email': user.email, 'phone': user.phone, 'address_list': address_list, "address_main": main_address}, status=status.HTTP_200_OK)  
 
-@api_view(['POST'])
-@jwt_authenticated
-def set_main_address(request, id):
-    return None
-
-# @api_view(['GET'])
-# @jwt_authenticated
-# def testing(request):
-#     if request.method == 'GET':
-#         user = User.objects.get(email=request.user.email)
-#         print(type(user))
-
     
