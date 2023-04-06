@@ -23,7 +23,6 @@ class Address(models.Model):
     city = models.CharField(max_length=100)
     province = models.CharField(max_length=100)
     zip_code = models.CharField(max_length=100)
-    is_main = models.BooleanField(default=False)
 
 
 

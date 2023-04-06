@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from django.urls.conf import include
 from django.views.decorators.csrf import ensure_csrf_cookie
-from .views import register, login, logout, get_user_session, register_admin, edit_profile, get_user_profile, add_address, testing, set_main_address
+from .views import register, login, logout, get_user_session, register_admin, edit_profile, get_user_profile, add_address
 
 urlpatterns = [
     path('register', register, name='register'),
@@ -13,6 +13,4 @@ urlpatterns = [
     path('edit-profile', edit_profile, name='edit-profile'),
     path('get-user-profile', get_user_profile, name='get-user-profile'),
     path('add-address', add_address, name='add-address'),
-    path('set-address/<str:id>', set_main_address, name='add-address'),
-    # path('testing', testing, name='testing'),
 ]
