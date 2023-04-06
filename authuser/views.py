@@ -98,6 +98,8 @@ def add_address(request):
         deserialize = json.loads(request.body)
         user = User.objects.get(email=request.user.email)
         address = Address(user_id=user, address_name = deserialize['address_name'] ,street=deserialize['street'], city=deserialize['city'], province=deserialize['province'], zip_code=deserialize['zip_code'])
+        if not Address.objects.filter(user_id=user).exists():
+            address.is_main = True
         address.save()
         return JsonResponse({'message': 'Address added successfully'}, status=status.HTTP_200_OK)
 
@@ -107,8 +109,23 @@ def get_user_profile(request):
     if request.method == 'GET':
         user = User.objects.get(email=request.user.email)
         address = Address.objects.filter(user_id=user)
-        return JsonResponse({'user': user.email, 'name': user.name, 'phone': user.phone, 'address': [{'address_name': i.address_name, 'street': i.street, 'city': i.city, 'province': i.province, 'zip_code': i.zip_code} for i in address]}, status=status.HTTP_200_OK)
-        
+        main_address = Address.objects.get(user_id=user, is_main=True)
+        main_address = {'address_name': main_address.address_name, 'street': main_address.street, 'city': main_address.city, 'province': main_address.province, 'zip_code': main_address.zip_code}
+        address_list = []
+        for i in address:
+            address_list.append({'address_name': i.address_name, 'street': i.street, 'city': i.city, 'province': i.province, 'zip_code': i.zip_code, "id": i.id})
+        return JsonResponse({'name': user.name, 'email': user.email, 'phone': user.phone, 'address_list': address_list, "address_main": main_address}, status=status.HTTP_200_OK)  
 
+@api_view(['POST'])
+@jwt_authenticated
+def set_main_address(request, id):
+    return None
+
+# @api_view(['GET'])
+# @jwt_authenticated
+# def testing(request):
+#     if request.method == 'GET':
+#         user = User.objects.get(email=request.user.email)
+#         print(type(user))
 
     
