@@ -101,6 +101,7 @@ def add_address(request):
         address.save()
         return JsonResponse({'message': 'Address added successfully'}, status=status.HTTP_200_OK)
 
+
 @api_view(['GET'])
 @jwt_authenticated
 def get_user_profile(request):
