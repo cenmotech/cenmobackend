@@ -30,7 +30,6 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*', 'herokuapp.com', 'localhost', '.vercel.app', 'cenmo.tech']
 
-
 # Application definition
 
 INSTALLED_APPS = [
