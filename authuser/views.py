@@ -98,8 +98,6 @@ def add_address(request):
         deserialize = json.loads(request.body)
         user = User.objects.get(email=request.user.email)
         address = Address(user_id=user, address_name = deserialize['address_name'] ,street=deserialize['street'], city=deserialize['city'], province=deserialize['province'], zip_code=deserialize['zip_code'])
-        if not Address.objects.filter(user_id=user).exists():
-            address.is_main = True
         address.save()
         return JsonResponse({'message': 'Address added successfully'}, status=status.HTTP_200_OK)
 
