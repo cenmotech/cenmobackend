@@ -62,9 +62,20 @@ class TestViews(TestCase):
                 "zip_code":"dsdadsadasdsaddasasdasd",
                 "address_name":"nama"
             }
+        
+        address2 = {
+                "street":"dadsasdadsasda",
+                "city":"dadsasdsaaddsads",
+                "province":"adssdadasdsadsaddsa",
+                "zip_code":"dsdadsadasdsaddasasdasd",
+                "address_name":"nama2"
+            }
 
         self.user = User(name="meh",email="asd@gmail.com", password=make_password("asd123"),phone="1234567890")
+    
+        
         self.user.save()
+
         self.data = json.dumps(data)
         self.data2 = json.dumps(data2)
         self.data3 = json.dumps(data3)
@@ -73,6 +84,7 @@ class TestViews(TestCase):
         self.admin = json.dumps(admin)
         self.dummy = json.dumps(dummy)
         self.address = json.dumps(address)
+        self.address2 = json.dumps(address2)
 
     def test_register_success(self):
         #Make a post request to register endpoint from json data
@@ -208,7 +220,20 @@ class TestViews(TestCase):
         response = self.client.post(reverse('login'), self.data5, content_type='application/json')
         #Make a get request to get-profile endpoint
         accessToken = json.loads(response.content)['accessToken']
+        response = self.client.post(reverse('add-address'), self.address2, content_type='application/json', HTTP_AUTHORIZATION='Bearer ' + accessToken)
+
         response = self.client.get(reverse('get-user-profile'), HTTP_AUTHORIZATION='Bearer ' + accessToken)
+        #Check if response is 200
+        self.assertEquals(response.status_code, 200)
+    
+    def test_set_main_address(self):
+        #Make a post request to login endpoint from json data
+        response = self.client.post(reverse('login'), self.data5, content_type='application/json')
+        #Make a post request to add-address endpoint from json data
+        accessToken = json.loads(response.content)['accessToken']
+        response = self.client.post(reverse('add-address'), self.address2, content_type='application/json', HTTP_AUTHORIZATION='Bearer ' + accessToken)
+        #Make a post request to set-main-address endpoint from json data
+        response = self.client.post(reverse('set-address', kwargs={"id":1}), self.address2, content_type='application/json', HTTP_AUTHORIZATION='Bearer ' + accessToken)
         #Check if response is 200
         self.assertEquals(response.status_code, 200)
     
