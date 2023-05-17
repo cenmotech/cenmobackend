@@ -56,7 +56,8 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://localhost:3001',
     'https://cenmo-frontend-dickynasje.vercel.app',
-    'https://cenmo-frontend.vercel.app'
+    'https://cenmo-frontend.vercel.app',
+    'https://cenmo.tech',
     # add other domains as needed
 ]
 
