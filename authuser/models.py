@@ -2,6 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
+
 class User(AbstractUser):
     name = models.CharField(max_length=100)
     email = models.CharField(max_length=100, primary_key=True)
@@ -15,7 +16,8 @@ class User(AbstractUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
-    
+
+
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     address_name = models.CharField(max_length=100)
@@ -23,6 +25,4 @@ class Address(models.Model):
     city = models.CharField(max_length=100)
     province = models.CharField(max_length=100)
     zip_code = models.CharField(max_length=100)
-
-
-
+    is_main = models.BooleanField(default=False)

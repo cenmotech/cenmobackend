@@ -14,6 +14,8 @@ from datetime import timedelta
 from pathlib import Path
 import sys
 import os
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,17 +41,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres',
+    'django.contrib.postgres.aggregates',
     'rest_framework', 
     'group',
     'authuser',
-    'corsheaders'
+    'shopcart',
+    'corsheaders',
+    'transaction',
+    'admincenmo'
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'https://cenmo.tech',
     'http://localhost:3000',
+    'http://localhost:3001',
     'https://cenmo-frontend-dickynasje.vercel.app',
-    'https://cenmo-frontend.vercel.app',
+    'https://cenmo-frontend.vercel.app'
     # add other domains as needed
 ]
 
@@ -69,8 +76,6 @@ REST_FRAMEWORK = {
     ],
     'EXCEPTION_HANDLER': 'authuser.decorators.custom_exception_handler',
 }
-
-
 
 JWT_VERIFY_EXPIRATION = False
 
@@ -117,7 +122,7 @@ DATABASES = {
 
 
 if TESTING:  # Pycharm: https://stackoverflow.com/a/20836704/7069108
-    DATABASES = {
+    DATABASES = {       
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
@@ -153,6 +158,22 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+sentry_sdk.init(
+    dsn="https://142bfb636bfa483fab56f9d59aff076d@o4505197144047616.ingest.sentry.io/4505197159186432",
+    integrations=[
+        DjangoIntegration(),
+    ],
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0,
+
+    # If you wish to associate users to errors (assuming you are using
+    # django.contrib.auth) you may enable sending PII data.
+    send_default_pii=True
+)
 
 
 # Static files (CSS, JavaScript, Images)

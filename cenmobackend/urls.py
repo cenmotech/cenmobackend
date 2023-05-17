@@ -18,7 +18,10 @@ from django.urls import path
 from django.urls.conf import include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin-django/', admin.site.urls),
     path('authuser/', include('authuser.urls')),
-    path('group/', include('group.urls'))
+    path('group/', include('group.urls')),
+    path('shopcart/', include('shopcart.urls')),
+    path('transaction/', include('transaction.urls')),
+    path('admin/', include('admincenmo.urls')),
 ]

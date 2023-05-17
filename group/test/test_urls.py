@@ -52,7 +52,7 @@ class TestsUrls(TestCase):
         self.assertEquals(resolve(url).func, get_listing_by_logged_user)
     
     def test_url_is_resolved_get_listing_by_seller(self):
-        url = reverse('get_listing_by_seller', kwargs={'email': 'test@gmail.com'})
+        url = reverse('get_listing_by_seller')
         self.assertEquals(resolve(url).func, get_listing_by_seller)
 
     def test_url_is_resolved_get_listing_by_seller_on_group(self):
