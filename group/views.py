@@ -101,13 +101,19 @@ def get_all_categories_contains(request, keyword):
 @api_view(['GET'])
 @jwt_authenticated
 def get_all_categories(request):
-    category = Category.objects.all()
-
-    category_groups = []
-    for cat in category:
-        category_groups.append({"category_name": cat.category_name,
-                                "category_id": cat.category_id})
+    group = Group.objects.all()
+    category_groups = {}
+    for category in group:
+        category_name = category.group_category.category_name
+        if category_name not in category_groups:
+            category_groups[category_name] = []
+            category_groups[category_name].append({"group_name": category.group_name,
+                    "group_id": category.group_id})
+        else :
+            category_groups[category_name].append({"group_name": category.group_name,
+            "group_id": category.group_id})
     return JsonResponse({'category_groups': category_groups}, safe=False, status=status.HTTP_200_OK)
+
             
 @api_view(['POST'])
 @jwt_authenticated 
