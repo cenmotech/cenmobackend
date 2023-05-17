@@ -287,7 +287,10 @@ class TestViewsGroup(TestCase):
         
         get_response = self.client.get(reverse("get_all_categories"), HTTP_AUTHORIZATION="Bearer " + token)
         self.assertEqual(get_response.status_code, 200)
-        self.assertEqual(get_response.json(), {'category_groups': [{'category_name': 'Category 1', 'category_id': 1}, {'category_name': 'Category 2', 'category_id': 2}]})
+        self.assertEqual(get_response.json(), {'category_groups': {
+            'Category 1': [{'group_name': 'Group1', 'group_id': 1},{'group_name':'Group3', 'group_id': 3}],
+            'Category 2': [{'group_name': 'Group2', 'group_id': 2}],
+        }})
 
     def test_get_category_on_group_fail_no_token(self):
         get_response = self.client.get(reverse("get_all_categories"))
