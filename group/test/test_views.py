@@ -429,6 +429,15 @@ class TestListing(TestCase):
         response = self.client.post(reverse("search_listing_on_group", kwargs={"group":1, "name":"Kamera"}))
         self.assertEqual(response.status_code, 405)
 
+    def test_get_listing_by_id_success(self):
+        user_response = self.client.post(reverse("login"), self.user_data, content_type="application/json")
+        token = user_response.json().get("accessToken")
+        self.client.post(reverse("create_listing"), self.camera_data1, content_type="application/json", HTTP_AUTHORIZATION="Bearer " + token)
+
+        get_response = self.client.get(reverse("get_listing_by_id", kwargs={"id":1}), HTTP_AUTHORIZATION="Bearer " + token)
+        self.assertEqual(get_response.status_code, 200)
+        self.assertEqual(get_response.json().get("response").get("goods_name"), "Kamera Nikon")
+
     def test_get_listing_by_logged_user_success(self):
         user_response = self.client.post(reverse("login"), self.user_data, content_type="application/json")
         token = user_response.json().get("accessToken")
@@ -591,15 +600,6 @@ class TestPost(TestCase):
         response = self.client.get(reverse("create_post"))
         self.assertEqual(response.status_code, 405)
 
-    # def test_search_post_by_desc_success(self):
-    #     user_response = self.client.post(reverse("login"), self.user_data, content_type="application/json")
-    #     token = user_response.json().get("accessToken")
-    #     self.client.post(reverse("create_post"), self.post_data, content_type="application/json", HTTP_AUTHORIZATION="Bearer " + token)
-
-    #     search_response = self.client.get(reverse("search_post_by_desc", kwargs={"desc":"Test"}), HTTP_AUTHORIZATION="Bearer " + token)
-    #     self.assertEqual(search_response.status_code, 200)
-    #     self.assertEqual(search_response.json().get("response")[0].get("post_desc"), "Test post description")
-
     def test_search_post_by_desc_fail_no_token(self):
         search_response = self.client.get(reverse("search_post_by_desc", kwargs={"desc":"Test"}))
         self.assertEqual(search_response.status_code, 401)
@@ -611,15 +611,6 @@ class TestPost(TestCase):
     def test_search_post_by_desc_method_not_allowed(self):
         response = self.client.post(reverse("search_post_by_desc", kwargs={"desc":"Test"}))
         self.assertEqual(response.status_code, 405)
-
-    # def test_search_post_on_group_success(self):
-    #     user_response = self.client.post(reverse("login"), self.user_data, content_type="application/json")
-    #     token = user_response.json().get("accessToken")
-    #     self.client.post(reverse("create_post"), self.post_data, content_type="application/json", HTTP_AUTHORIZATION="Bearer " + token)
-
-    #     search_response = self.client.get(reverse("search_post_on_group", kwargs={"group":1,"desc":"Test"}), HTTP_AUTHORIZATION="Bearer " + token)
-    #     self.assertEqual(search_response.status_code, 200)
-    #     self.assertEqual(search_response.json().get("response")[0].get("post_desc"), "Test post description")
 
     def test_search_post_on_group_fail_no_token(self):
         search_response = self.client.get(reverse("search_post_on_group", kwargs={"group":1,"desc":"Test"}))
@@ -633,15 +624,6 @@ class TestPost(TestCase):
         response = self.client.post(reverse("search_post_on_group", kwargs={"group":1,"desc":"Test"}))
         self.assertEqual(response.status_code, 405)
 
-    # def test_get_post_by_logged_user_success(self):
-    #     user_response = self.client.post(reverse("login"), self.user_data, content_type="application/json")
-    #     token = user_response.json().get("accessToken")
-    #     self.client.post(reverse("create_post"), self.post_data, content_type="application/json", HTTP_AUTHORIZATION="Bearer " + token)
-
-    #     get_response = self.client.get(reverse("get_post_by_logged_user"), HTTP_AUTHORIZATION="Bearer " + token)
-    #     self.assertEqual(get_response.status_code, 200)
-    #     self.assertEqual(get_response.json().get("response")[0].get("post_desc"), "Test post description")
-
     def test_get_post_by_logged_user_fail_no_token(self):
         get_response = self.client.get(reverse("get_post_by_logged_user"))
         self.assertEqual(get_response.status_code, 401)
@@ -653,15 +635,6 @@ class TestPost(TestCase):
     def test_get_post_by_logged_user_method_not_allowed(self):
         response = self.client.post(reverse("get_post_by_logged_user"))
         self.assertEqual(response.status_code, 405)
-
-    # def test_get_post_on_group(self):
-    #     user_response = self.client.post(reverse("login"), self.user_data, content_type="application/json")
-    #     token = user_response.json().get("accessToken")
-    #     self.client.post(reverse("create_post"), self.post_data, content_type="application/json", HTTP_AUTHORIZATION="Bearer " + token)
-
-    #     get_response = self.client.get(reverse("get_post_on_group", kwargs={"group":1}), HTTP_AUTHORIZATION="Bearer " + token)
-    #     self.assertEqual(get_response.status_code, 200)
-    #     self.assertEqual(get_response.json().get("response")[0].get("post_desc"), "Test post description")
 
     def test_get_post_on_group_fail_no_token(self):
         get_response = self.client.get(reverse("get_post_on_group", kwargs={"group":1}))
@@ -693,15 +666,6 @@ class TestPost(TestCase):
 
         get_response = self.client.get(reverse("delete_post", kwargs={"group":1,"postingan_id":1}), HTTP_AUTHORIZATION="Bearer " + invalid_token)
         self.assertEqual(get_response.status_code, 401)
-
-    # def test_get_feed(self):
-    #     user_response = self.client.post(reverse("login"), self.user_data, content_type="application/json")
-    #     token = user_response.json().get("accessToken")
-    #     self.client.post(reverse("join_group"), {"id":1}, content_type="application/json", HTTP_AUTHORIZATION="Bearer " + token)
-
-    #     get_response = self.client.get(reverse("get_feed"), HTTP_AUTHORIZATION="Bearer " + token)
-    #     self.assertEqual(get_response.status_code, 200)
-
     
     def test_get_feed_fail_no_token(self):
         get_response = self.client.get(reverse("get_feed"))

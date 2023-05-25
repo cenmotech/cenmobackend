@@ -122,7 +122,7 @@ def get_user_profile(request):
         address_list = []
         for i in address:
             address_list.append({'address_name': i.address_name, 'street': i.street, 'city': i.city, 'province': i.province, 'zip_code': i.zip_code, "id": i.id})
-        return JsonResponse({'name': user.name, 'email': user.email, 'phone': user.phone, 'address_list': address_list, "address_main": main_address}, status=status.HTTP_200_OK) 
+        return JsonResponse({'name': user.name, 'email': user.email, 'phone': user.phone, 'balance': user.balance, 'address_list': address_list, "address_main": main_address}, status=status.HTTP_200_OK) 
 
 @api_view(['POST'])
 @jwt_authenticated

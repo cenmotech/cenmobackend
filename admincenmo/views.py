@@ -69,3 +69,14 @@ def get_all_groups_data(request):
             group_dict['group_category'] = group.group_category.category_name
             groups_list.append(group_dict)
         return JsonResponse({'groups_list': groups_list}, status=status.HTTP_200_OK)
+    
+
+@api_view(['GET'])
+@jwt_authenticated
+def get_all_categories_for_admin(request):
+    category = Category.objects.all()
+    category_groups = []
+    for cat in category:
+        category_groups.append({"category_name": cat.category_name,
+                                "category_id": cat.category_id})
+    return JsonResponse({'category_groups': category_groups}, safe=False, status=status.HTTP_200_OK)

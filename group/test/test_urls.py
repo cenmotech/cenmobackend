@@ -38,6 +38,10 @@ class TestsUrls(TestCase):
     def test_url_is_resolved_get_post_on_group(self):
         url = reverse('get_post_on_group', kwargs={'group': 1})
         self.assertEquals(resolve(url).func, get_post_on_group)
+
+    def test_url_is_resolved_get_listing_by_id(self):
+        url = reverse('get_listing_by_id', kwargs={'id': 1})
+        self.assertEquals(resolve(url).func, get_listing_by_id)
         
     def test_url_is_resolved_search_listing_by_name(self):
         url = reverse('search_listing_by_name', kwargs={'name': 'test'})
