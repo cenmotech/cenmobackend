@@ -13,6 +13,7 @@ class User(AbstractUser):
     id_photo = models.ImageField(upload_to='id_photo', null=True, blank=True)
     is_admin = models.BooleanField(default=False)
     is_buyerseller = models.BooleanField(default=False)
+    balance = models.IntegerField(default=0)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

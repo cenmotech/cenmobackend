@@ -16,6 +16,9 @@ import sys
 import os
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&!a%bi@e=4yms@h4wefydx(y-)z$4#@1wtrf$40-+c9y%vm-81'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -58,6 +61,7 @@ CORS_ALLOWED_ORIGINS = [
     'https://cenmo-frontend-dickynasje.vercel.app',
     'https://cenmo-frontend.vercel.app',
     'https://cenmo.tech',
+    'https://cenmo-pro-fikriazain.vercel.app',
     # add other domains as needed
 ]
 
@@ -106,10 +110,10 @@ TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
 DATABASES = {
  'default': {
     'ENGINE': 'django.db.backends.postgresql',
-    'NAME': 'postgres',
-    'USER': 'postgres',
-    'PASSWORD': 'FkcWa6Oy0Ebr',
-    'HOST': 'db.krparxvtaxxgroffdseu.supabase.co',
+    'NAME': os.environ.get('DB_NAME_USER'),
+    'USER': os.environ.get('DB_NAME_USER'),
+    'PASSWORD': os.environ.get('DB_PASSWORD'),
+    'HOST': os.environ.get('DB_HOST'),
     'PORT': '5432',
     'OPTIONS': {
             'options': '-c search_path=public'

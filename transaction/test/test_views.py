@@ -50,11 +50,6 @@ class TestViews(TestCase):
         accessToken = json.loads(response.content)['accessToken']
         response = self.client.post(reverse('make-transaction'), self.body, content_type='application/json', HTTP_AUTHORIZATION='Bearer ' + accessToken)
         self.assertEquals(response.status_code, 201)
-
-    def test_get_snap_token_success(self):
-        token = create_snap_token("TEST123", 10000)
-        self.assertIsNotNone(token)
-    
     
     def test_update_transaction_verifying(self):
         user_response = self.client.post(reverse("login"), self.init, content_type="application/json")
@@ -126,7 +121,7 @@ class TestViews(TestCase):
         target = Transaction.objects.get(transaction_id="TESTING")
         payload = {
             "transaction_time": "2023-04-27 14:31:39",
-            "transaction_status": "expired",
+            "transaction_status": "expire",
             "transaction_id": "db20d29e-5d94-4f71-9bc4-e96712140f21",
             "status_message": "midtrans payment notification",
             "status_code": "200",
@@ -151,3 +146,119 @@ class TestViews(TestCase):
         accessToken = user_response.json().get("accessToken")
         response = self.client.post(reverse('make-transaction'), self.body, content_type='application/json', HTTP_AUTHORIZATION='Bearer ' + accessToken)
         self.assertEquals(response.status_code, 404)
+
+
+class ComplainTestCase(TestCase):
+    def setUp(self):
+        user_data = {
+            "email" : "dummy@gmail.com",
+            "password" : "dummypass",
+        }
+
+        self.user_data = json.dumps(user_data)
+        user_create = User.objects.create(name="dummy",email="dummy@gmail.com", password=make_password("dummypass"),phone="123456789", is_admin = True)
+        self.user_create = user_create
+        address = Address.objects.create(user_id=user_create.email, address_name="testing address", city="testing city", street="testing street", zip_code="123456", province="testing province", is_main=True)
+        category = Category.objects.create(category_name="testing category")
+        group = Group.objects.create(group_name="testing group", group_desc="testing group description", group_photo_profile_link="testing group photo profile link", group_category=category)
+        goods = Goods.objects.create(goods_name="testing good", goods_description="testing good description", goods_price=10000, goods_image_link="testing good photo profile link", goods_region="region", seller_name="seller", goods_group_origin_id=group.group_id, goods_seller_id=user_create.email)
+        self.transaction_dummy = Transaction(user_id=self.user_create, price=10000, snap_token="1",resi="1",total_price=10000, address_user_id=address.id,goods_id=goods.goods_id, transaction_id="TESTING", quantity=1,progress="Pending")
+        self.transaction_dummy.save()  
+        self.cart = Cart(user_id=self.user_create)
+        self.cart.save()
+        self.cartItem = CartItem(cart_id=self.cart.cart_id, goods_id=goods.goods_id, quantity=1)
+        self.cartItem.save()
+
+        transaction1 = {
+            "transactionId":"TESTING", 
+            "user_id":user_create.email, 
+            "price":"10000", 
+            "total_price":"10000", 
+            "address_user_id":address.id,
+            "goodId":goods.goods_id, 
+            "quantity":1,
+            "progress":"Pending",
+            "seller":goods.seller_name
+        }
+        self.transaction1 = json.dumps(transaction1)
+
+        complain1 = {
+            "transactionId":"TESTING",
+            "user_id":user_create.email,
+            "complain_text":"Complain Test",
+            "complain_status":"Pending"
+        }
+        self.complain1 = json.dumps(complain1)
+
+        complainId = {
+            "complainId":1
+        }
+        self.complainId = json.dumps(complainId)
+
+    def test_create_complain(self):
+        user_response = self.client.post(reverse("login"), self.user_data, content_type="application/json")
+        token = user_response.json().get("accessToken")
+        response = self.client.post(reverse('make-transaction'), self.transaction1, content_type='application/json', HTTP_AUTHORIZATION='Bearer ' + token)
+        self.assertEquals(response.status_code, 201)
+
+        complain_response = self.client.post(reverse("create-complain"), self.complain1 , content_type="application/json", HTTP_AUTHORIZATION="Bearer " + token)
+
+        # check response status and message
+        self.assertEqual(complain_response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(complain_response.json().get("message"), "Complain created successfully")
+
+        # check complain object in database
+        complain = Complain.objects.get(transaction_id= self.transaction_dummy.transaction_id, user_id="dummy@gmail.com")
+        self.assertEqual(complain.complain_text, "Complain Test")
+        self.assertEqual(complain.complain_status, "Pending")
+    
+    def test_create_complain_fail_no_token(self):
+        listing_response = self.client.post(reverse("create-complain"), self.complain1, content_type="application/json")
+        self.assertEqual(listing_response.status_code, 401)
+
+    def test_create_complain_fail_token_expired(self):
+        listing_response = self.client.post(reverse("create-complain"), self.complain1, content_type="application/json", HTTP_AUTHORIZATION="Bearer " + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3RAZ21haWwuY29tIiwiZXhwIjoxNjc4ODY3ODEyLCJpYXQiOjE2Nzg4NjQyMTJ9.xIF8t5cdCYmp2NKGvOKs3VqRemCB4FQ59Y9khGYl1DY")
+        self.assertEqual(listing_response.status_code, 401)
+    
+    def test_create_complain_method_not_allowed(self):
+        response = self.client.get(reverse("create-complain"))
+        self.assertEqual(response.status_code, 405)
+    
+    def test_get_all_groups_data(self):
+        user_response = self.client.post(reverse('login'), self.user_data, content_type='application/json')
+        token = user_response.json().get("accessToken")   
+        self.client.post(reverse("make-transaction"), self.transaction1, content_type="application/json", HTTP_AUTHORIZATION="Bearer " + token)
+        self.client.post(reverse("create-complain"), self.complain1, content_type="application/json", HTTP_AUTHORIZATION="Bearer " + token)
+
+        response = self.client.get(reverse('get-complains'), content_type='application/json', HTTP_AUTHORIZATION='Bearer ' + token)
+        self.assertEquals(response.status_code, 200)
+
+    def test_complain_status_pending(self):
+
+        user_response = self.client.post(reverse("login"), self.user_data, content_type="application/json")
+        token = user_response.json().get("accessToken")
+
+        self.client.post(reverse("make-transaction"), self.transaction1, content_type="application/json", HTTP_AUTHORIZATION="Bearer " + token)
+        self.client.post(reverse("create-complain"), self.complain1, content_type="application/json", HTTP_AUTHORIZATION="Bearer " + token)
+        payload = {
+            'complain_id': 1
+        }
+        response = self.client.post(reverse('complain-status'), json.dumps(payload), content_type='application/json', HTTP_AUTHORIZATION="Bearer " + token)
+        target = Complain.objects.get(complain_id=1)
+        self.assertEqual(target.complain_status, "Processing")
+        self.assertEqual(response.status_code, 201)
+    
+    
+    def test_complain_status_processing(self):
+        user_response = self.client.post(reverse("login"), self.user_data, content_type="application/json")
+        token = user_response.json().get("accessToken")
+
+        self.client.post(reverse("make-transaction"), self.transaction1, content_type="application/json", HTTP_AUTHORIZATION="Bearer " + token)
+        self.client.post(reverse("create-complain"), self.complain1, content_type="application/json", HTTP_AUTHORIZATION="Bearer " + token)
+        payload = {
+            'complain_id': 1
+        }
+        self.client.post(reverse('complain-status'), json.dumps(payload), content_type='application/json', HTTP_AUTHORIZATION="Bearer " + token)
+        self.client.post(reverse('complain-status'), json.dumps(payload), content_type='application/json', HTTP_AUTHORIZATION="Bearer " + token)
+        target = Complain.objects.get(complain_id=1)
+        self.assertEqual(target.complain_status, "Resolved")

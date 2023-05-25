@@ -80,4 +80,10 @@ class TestViews(TestCase):
         accessToken = json.loads(response.content)['accessToken']
         response = self.client.get(reverse('get-all-groups-data'), content_type='application/json', HTTP_AUTHORIZATION='Bearer ' + accessToken)
         self.assertEquals(response.status_code, 200)
+    
+    def test_get_all_categories_group_admin(self):
+        response = self.client.post(reverse('login'), self.init, content_type='application/json')
+        accessToken = json.loads(response.content)['accessToken']
+        response = self.client.get(reverse('get_all_categories_for_admin'), content_type='application/json', HTTP_AUTHORIZATION='Bearer ' + accessToken)
+        self.assertEquals(response.status_code, 200)
 

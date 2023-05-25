@@ -12,6 +12,7 @@ from rest_framework.decorators import api_view
 import json
 from django.views.decorators.http import require_POST, require_GET
 from django.contrib.postgres.aggregates import ArrayAgg
+from django.db.models import Q
 
 @api_view(['POST'])
 @jwt_authenticated
@@ -149,8 +150,13 @@ def search_post_by_desc(request, desc):
 @api_view(['GET'])
 @jwt_authenticated
 def search_post_on_group(request, desc, group):
+    tags = request.GET.get('tags')
     group = Group.objects.get(group_id=group)
-    post_object = Post.objects.filter(post_group_origin=group, post_desc__icontains=desc).order_by('-post_id').annotate(tags=ArrayAgg('post_tags__tags_name'))
+    post_object = Post.objects.filter(post_group_origin=group, post_desc__icontains=desc)
+    if tags is not None:
+        tags = tags.split(',')
+        post_object = post_object.filter(Q(post_tags__tags_name__in=tags))
+    post_object = post_object.order_by('-post_id').annotate(tags=ArrayAgg('post_tags__tags_name'))
     post = list(post_object.values("post_id", "post_desc", "post_image_link", "post_date", "post_likes", "post_group_origin", "post_user", "post_user__name", "post_user_name", "tags"))
     return JsonResponse({"response":post}, safe=False, status=status.HTTP_200_OK)
     
@@ -165,8 +171,13 @@ def get_post_by_logged_user(request):
 @api_view(['GET'])
 @jwt_authenticated
 def get_post_on_group(request, group):
+    tags = request.GET.get('tags')
     group = Group.objects.get(group_id=group)
-    post_object = Post.objects.filter(post_group_origin=group).order_by('-post_id').annotate(tags=ArrayAgg('post_tags__tags_name'))
+    post_object = Post.objects.filter(post_group_origin=group)
+    if tags is not None:
+        tags = tags.split(',')
+        post_object = post_object.filter(Q(post_tags__tags_name__in=tags))
+    post_object = post_object.order_by('-post_id').annotate(tags=ArrayAgg('post_tags__tags_name'))
     post = list(post_object.values("post_id", "post_desc", "post_image_link", "post_date", "post_likes", "post_group_origin", "post_user", "post_user__name", "post_user_name", "tags"))
     return JsonResponse({"response":post}, safe=False, status=status.HTTP_200_OK)
     
@@ -194,7 +205,12 @@ def search_listing_on_group(request, name, group):
 @jwt_authenticated
 def get_listing_by_logged_user(request):
     user = User.objects.get(email=request.user.email)
-    goods = Goods.objects.filter(goods_seller=user).order_by('-goods_id').values()[::1]
+    goods = Goods.objects.filter(goods_seller=user, stock__gt=0).order_by('-goods_id').values()[::1]
+    return JsonResponse({"response":goods}, safe=False, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_listing_by_id(request, id):
+    goods = Goods.objects.filter(goods_id=id).values("goods_id", "goods_name", "goods_price", "goods_description", "goods_image_link", "goods_region", "goods_group_origin", "goods_seller__email", "goods_seller__name", "stock")[0]
     return JsonResponse({"response":goods}, safe=False, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
@@ -216,19 +232,26 @@ def get_listing_by_seller(request):
     goods = Goods.objects.filter(goods_seller=user).order_by('-goods_id').values()[::1]
     return JsonResponse({"response":goods}, safe=False, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+@jwt_authenticated
+def get_all_listing_from_seller(request, email, id):
+    user = User.objects.get(email=email)
+    goods = Goods.objects.filter(goods_seller=user, stock__gt=0).exclude(goods_id=id).order_by('-goods_id').values()[::1]
+    return JsonResponse({"response":goods}, status=status.HTTP_200_OK)
+
 @api_view(['GET'])  
 @jwt_authenticated
 def get_listing_by_seller_on_group(request, group, email):
     user = User.objects.get(email=email)
     group = Group.objects.get(group_id=group)
-    goods = Goods.objects.filter(goods_group_origin=group, goods_seller=user).order_by('-goods_id').values()[::1]
+    goods = Goods.objects.filter(goods_group_origin=group, goods_seller=user, stock__gt=0).order_by('-goods_id').values()[::1]
     return JsonResponse({"response":goods}, safe=False, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @jwt_authenticated
 def get_listing_on_group(request, group):
     group = Group.objects.get(group_id=group)
-    goods = Goods.objects.filter(goods_group_origin=group).order_by('-goods_id').values()[::1]
+    goods = Goods.objects.filter(goods_group_origin=group, stock__gt=0).order_by('-goods_id').values()[::1]
     return JsonResponse({"response":goods}, safe=False, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
@@ -257,7 +280,7 @@ def get_feed(request):
 def get_store(request):
     user = User.objects.get(email=request.user.email)
     joined_groups = Group.objects.filter(group_member=user)
-    goods = Goods.objects.filter(goods_group_origin__in=joined_groups).order_by('-goods_id').values()[::1]
+    goods = Goods.objects.filter(goods_group_origin__in=joined_groups, stock__gt=0).order_by('-goods_id').values()[::1]
     return JsonResponse({"response": goods}, safe=False, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
